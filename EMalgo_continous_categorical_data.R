@@ -3,51 +3,14 @@
 #Model Based Learning project
 #Groupe : Florent Jakubowski et Marc Telly 
 #Date : 2020-11-15
-#For mor informations read the README
-#All functions should be tested with unit tests using testthat package
-#To understand our way of writting code see the book CleanCode. 
+#For more informations read the README
 
 # packages ####
 library(bayess)
 library(mvtnorm)
 
-
-# FLO function TransformCategoricalVectorToBinaryMatrice ####
-TransformCategoricalVectorToBinaryMatrice <- function (categoricalVector) {
-  vectorUniqueValues <- unique(categoricalVector)
-  binaryMatrice <- matrix(0, nrow=length(categoricalVector), ncol=length(vectorUniqueValues))
-  for (i in 1:length(categoricalVector)) {
-    binaryMatrice[i, which(vectorUniqueValues == categoricalVector[i])] <- 1
-  }
-  return(binaryMatrice)
-}
-
-# FLO function BinarizeCategorialMatrice #####
-BinarizeCategoricalMatrice = function(CategoricalMatrice) {
-  if( ncol(CategoricalMatrice) == 1){ 
-    return(TransformCategoricalVectorToBinaryMatrice(CategoricalMatrice))
-    }
-  else{
-    BinarizedCategoricalMatrice = Reduce(cbind, lapply(CategoricalMatrice, TransformCategoricalVectorToBinaryMatrice))
-    return(BinarizedCategoricalMatrice)
-  }
-}
-
-# FLO MBL-1 function CutDataSetIntoCategoricalandContinous ####
-splitDatasetIntoCatAndConti <- function(data) {
-  categorical <- data[lapply(data, class) == "factor"]
-  continuous <- data[lapply(data, class) == "numeric"]
-  return(list(continuous = continuous, categorical = categorical))
-}
-
-ds_test = iris
-res = SplitDataSetIntoCateAndContiMatrices(ds_test)
-x = cbind(res$CategoricalMatrix, res$ContinuousMatrix)
-x = getP(x)
-res = cutDatasetIntoCatAndCat(ds_test)
-# TransformCategoricalVectorToBinaryMatrice(res$CategoricalMatrix)
-# xBinary = BinarizeCategoricalMatrice(res$CategoricalMatrix)
-# print(xBinary)
+#sources
+source(file = "organize_dataset.R")
 
 # FLO MBL-2 function loglik ####
 # on suppose que les données en entrée présentes d'abord des données catégorielles binarisées
