@@ -26,7 +26,7 @@ initializeModel <- function(continuousData, categoricalData,  numberOfClass, ITE
   ## Object initialisation
   # gaussian model
   proportionContinousData[1,] <- rdirichlet(1, par=rep(1,numberOfClass))
-  mu[1,,] <- as.matrix(obs[sample(1:n,numberOfClass),])
+  mu[1,,] <- as.matrix(continuousData[sample(1:n,numberOfClass),])
   for (k in 1:numberOfClass){
     sigma[k,1,,] <- cov(matrix(rnorm(p*p), ncol = p))
   }
@@ -41,3 +41,4 @@ initializeModel <- function(continuousData, categoricalData,  numberOfClass, ITE
   }
   
 }
+
