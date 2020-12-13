@@ -53,6 +53,17 @@ test_that("8)binarizeCateMatrix test df input ?  ", {
 })
 
 # test splitDatasetIntoCatAndConti ####
+
+# Conti = NROW(splitDatasetIntoCatAndConti(iris)$continuousMat)
+# print(Conti)
+# Cate = NROW(splitDatasetIntoCatAndConti(iris)$categoricalMat)
+# print(Cate)
+# test_that("x)splitDatasetIntoCatAndConti same output length ? ", {
+#    expect_length(Cate, Conti)
+# })
+#Conti : 150
+#Cate : [1] 150 quel type de données ? 
+
 expectedOutputSplit = list(continuousMat = data.frame(iris[,1:4]), 
                            categoricalMat = data.frame(iris[,5]) )
 test_that("9)splitDatasetIntoCatAndConti test continousMat and categoricalMat ?  ", {
