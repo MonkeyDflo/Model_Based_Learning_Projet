@@ -1,5 +1,16 @@
 # Function initialize
-
+#' Function initializeModel
+#' Initialize model containers objects (arrays, matrix and vector) that
+#'  contains proportion of each class, vector of means(mu), matrix of covariance
+#'  and probabilities alpha of multinomial model.
+#'@param continuousData continuous data result of split data function
+#'@param categoricalData categorical data result of plit data function
+#'@param nbClass number of class
+#'@param ITERMAX maximum iteration
+#'
+#'@return list object containing proportion vectors, means vectors, sigmas matrix
+#' alpha matrix
+#'
 initializeModel <- function(continuousData, categoricalData, nbClass, ITERMAX) {
   require(bayess)
   
@@ -11,46 +22,48 @@ initializeModel <- function(continuousData, categoricalData, nbClass, ITERMAX) {
   n <- nrow(continuousData);  p <- ncol(continuousData)
   
   #[Object creation] of gaussian model
-  propContinousData <- matrix(NA, ITERMAX+1, nbClass)
+  prop <- matrix(NA, ITERMAX+1, nbClass)
   mu <- array(NA, dim = c(ITERMAX+1, nbClass, p))
   sigma <- array(NA, dim = c(ITERMAX+1, nbClass, p, p))
   
   # Creation of object that contain alpha an proportion in 
   # multinomial model
-  numberOfCategory <- NCOL(categoricalData)
-  propCategoricalData <- matrix(NA, ITERMAX+1, nbClass)
-  alphaContainer <- list()
+  nbCatLevel <- NCOL(categoricalData)
+  #alpha <- array(NA, data = c(ITERMAX, nbClass, nbCatLevel))
+  alpha <- matrix(NA, nbClass, nbCatLevel)
   
-  for (j in 1: numberOfCategory){
-    for( k in 1:nbClass){
-      numberOfLevel <- length(unique(categoricalData[,j])) # Variable that contain nber of level
-      alpha <- array(NA, dim = c(ITERMAX+1, nbClass, numberOfLevel)) #Array of alpha by iteration, cathegory and level
-      alphaContainer[[j]] <- alpha
-    }
-  }
+  #alphaContainer <- list()
+  # for (j in 1: nbCatLevel){
+  #   for( k in 1:nbClass){
+  #     numberOfLevel <- length(unique(categoricalData[,j])) # Variable that contain nber of level
+  #     alpha <- array(NA, dim = c(ITERMAX+1, nbClass, numberOfLevel)) #Array of alpha by iteration, cathegory and level
+  #     alphaContainer[[j]] <- alpha
+  #   }
+  # }
+  
+  
   
   ## Object initialisation
   # gaussian model
-  propContinousData[1,] <- rdirichlet(1, par=rep(1,nbClass))
+  prop[1,] <- rdirichlet(1, par=rep(1,nbClass))
   mu[1,,] <- as.matrix(continuousData[sample(1:n,nbClass),])
   for (k in 1:nbClass){
     sigma[k,1,,] <- cov(matrix(rnorm(p*p), ncol = p))
   }
   
   # Multinomial
-  propCategoricalData[1,] <- rdirichlet(1, par=rep(1,nbClass))
-  for(j in 1:numberOfCategory){
-    numberOfLevel <- length(unique(categoricalData[,j]))
-    for(h in 1:numberOfLevel){
-      alphaContainer[[j]][1,,h]<-rdirichlet(n = 1, par = rep(1, nbClass))
-    }
-  }
+  alpha[,] <- rdirichlet(nbClass, par=rep(1,nbCatLevel))
   
-  return(list(propContinousData = propContinousData,
+  # for(j in 1:nbCatLevel){
+  #   numberOfLevel <- length(unique(categoricalData[,j]))
+  #   for(h in 1:numberOfLevel){
+  #     alphaContainer[[j]][1,,h]<-rdirichlet(n = 1, par = rep(1, nbClass))
+  #   }
+  #
+  return(list(prop = prop,
               mu = mu,
               sigma = sigma,
-              propCategoricalData = propCategoricalData,
-              alphaContainer = alphaContainer
+              alpha = alpha
               ))
 }
-
+nbCatLevel <- 3
