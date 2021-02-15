@@ -1,6 +1,9 @@
 # EM algorithm function
 #' runEMAlgoritm
 #' This function perform the whole EM algorithm
+#' @param data
+#' @param nbClass
+#' @param ITERMAX, 
 runEMAlgoritm <- function(data, nbClass, ITERMAX, mode = "random"){
   # Split of data
   # In this step data are split in 2 dataset continous and categorical
@@ -21,7 +24,7 @@ runEMAlgoritm <- function(data, nbClass, ITERMAX, mode = "random"){
   ITER <- 1
   LIMITE <- 1
   
-  while(ITER < ITERMAX | LIMITE > 1e-6){
+  while(ITER < ITERMAX){
     # Perform Expectaion step
     
     
@@ -33,6 +36,14 @@ runEMAlgoritm <- function(data, nbClass, ITERMAX, mode = "random"){
     
     
     ITER <- ITER +1
+    if(LIMITE <=1e-6){
+      return(
+        c(
+          print(paste("WARNING: we stoped the algorithm because limit is under or equal to)", 1e-6))
+        ),
+        list())
+      break
+    }
   }
   
   return()
