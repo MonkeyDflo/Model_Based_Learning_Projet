@@ -66,4 +66,3 @@ initializeModel <- function(continuousData, categoricalData, nbClass, ITERMAX) {
               alpha = alpha
               ))
 }
-nbCatLevel <- 3
