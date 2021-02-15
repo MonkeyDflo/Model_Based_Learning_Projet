@@ -25,12 +25,6 @@ CalculateLoglik = function(xCate, xConti, KnbClasse, prop, mu, sigma, alpha, ITE
       ProduitSurCateg = 1
       for(j in 1:length(alpha[1,])){
         
-        # for(j in 1:numberOfCategory){
-        #   numberOfLevel <- length(unique(categoricalData[,j]))
-        #   for(h in 1:numberOfLevel){
-        #     alphaContainer[[j]][1,,h]<-rdirichlet(n = 1, par = rep(1, nbClass))
-        #   }
-        # }
         ProduitSurCateg = ProduitSurCateg * alpha[k,j]^xCate[i,j]
       }
       # => une fois qu'on a les produits sur les catégories 
