@@ -4,6 +4,7 @@
 # All functions could be tested with unit tests using testthat package
 # For more details see README
 
+# function CalculateLoglik ####
 #'function CalculateLoglik
 #' @param xCate Matrix of categorical variables for input datas
 #' @param xConti Matrix of continuous variables for input datas
@@ -14,26 +15,96 @@
 #' @param alpha Probabilities for each categorical variables 
 #' @return log likelihood
 #' @export
-CalculateLoglik = function(xCate, xConti, KnbClasse, prop, mu, sigma, alpha){
+CalculateLoglik = function(xCate, xConti, KnbClasse, prop, mu, sigma, alpha, ITER){
   n = nrow(xCate)
   SommeSurIndividus = 0
   for(i in 1:n){
     SommeSurClasses = 0
     for(k in 1:KnbClasse){
+      
       ProduitSurCateg = 1
       for(j in 1:length(alpha[1,])){
+        
+        # for(j in 1:numberOfCategory){
+        #   numberOfLevel <- length(unique(categoricalData[,j]))
+        #   for(h in 1:numberOfLevel){
+        #     alphaContainer[[j]][1,,h]<-rdirichlet(n = 1, par = rep(1, nbClass))
+        #   }
+        # }
         ProduitSurCateg = ProduitSurCateg * alpha[k,j]^xCate[i,j]
       }
       # => une fois qu'on a les produits sur les catégories 
       # on multiplie itérativement par fk(x)
       # mu (ajouter une dim si on veut la stocker en fct du nombre d'itération)
       # sigma (pareil que mu)
-      PrdCateConti = ProduitSurCateg * dmvnorm(xConti[i,],mean=mu[k,],sigma=sigma[k,,])
+      print(paste('dmvnorm'))
+      currX = xConti[i,]
+      currMu = mu[ITER,k,]
+      currSigma = sigma[ITER,k,,]
+      fkConti= dmvnorm(currX,currMu,currSigma) 
+      PrdCateConti = ProduitSurCateg * fkConti
       
-      SommeSurClasses = SommeSurClasses + prop[k] * PrdCateetConti
+      SommeSurClasses = SommeSurClasses + prop[ITER,k] * PrdCateConti
     }
     SommeSurIndividus = SommeSurIndividus + log(SommeSurClasses)
   }
   return(SommeSurIndividus)
 }
 
+# initialise ######
+# Function initialize
+initializeModel <- function(continuousData, categoricalData, nbClass, ITERMAX) {
+  require(bayess)
+  
+  if(is.factor(categoricalData)){
+    print(paste("Error categoricalData is a factor vector"))
+    return(NULL)
+  }
+  # data information
+  n <- nrow(continuousData);  p <- ncol(continuousData)
+  
+  #[Object creation] of gaussian model
+  prop <- matrix(NA, ITERMAX+1, nbClass)
+  mu <- array(NA, dim = c(ITERMAX+1, nbClass, p))
+  sigma <- array(NA, dim = c(ITERMAX+1, nbClass, p, p))
+  
+  # Creation of object that contain alpha an proportion in 
+  # multinomial model
+  nbCatLevel <- NCOL(categoricalData)
+  #alpha <- array(NA, data = c(ITERMAX, nbClass, nbCatLevel))
+  alpha <- matrix(NA, nbClass, nbCatLevel)
+  
+  ## Object initialisation
+  # gaussian model
+  prop[1,] <- rdirichlet(1, par=rep(1,nbClass))
+  mu[1,,] <- as.matrix(continuousData[sample(1:n,nbClass),])
+  for (k in 1:nbClass){
+    sigma[1,k,,] <- cov(matrix(rnorm(p*p), ncol = p))
+  }
+  
+  # Multinomial
+  alpha[,] <- rdirichlet(nbClass, par=rep(1,nbCatLevel))
+  
+  #loglik 
+  loglik <- array(NA, ITERMAX+1)
+  
+  return(list(prop = prop,
+              mu = mu,
+              sigma = sigma,
+              alpha = alpha,
+              loglik = loglik
+  ))
+}
+
+# tests ####
+# split ... 
+source(file = "organize_dataset.R")
+res = splitDatasetIntoCatAndConti(iris)
+cat = res$categoricalMat
+resCate = binarizeCateMatrix(cat)
+# initialise 
+init = initializeModel(res$continuousMat, resCate, 3, 10)
+
+# test loglik
+loglik = CalculateLoglik(resCate, res$continuousMat, 3, init$prop, init$mu, init$sigma, init$alpha, ITER=1)
+print(loglik)
