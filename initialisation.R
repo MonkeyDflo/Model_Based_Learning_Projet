@@ -31,18 +31,7 @@ initializeModel <- function(continuousData, categoricalData, nbClass, ITERMAX) {
   nbCatLevel <- NCOL(categoricalData)
   #alpha <- array(NA, data = c(ITERMAX, nbClass, nbCatLevel))
   alpha <- matrix(NA, nbClass, nbCatLevel)
-  
-  #alphaContainer <- list()
-  # for (j in 1: nbCatLevel){
-  #   for( k in 1:nbClass){
-  #     numberOfLevel <- length(unique(categoricalData[,j])) # Variable that contain nber of level
-  #     alpha <- array(NA, dim = c(ITERMAX+1, nbClass, numberOfLevel)) #Array of alpha by iteration, cathegory and level
-  #     alphaContainer[[j]] <- alpha
-  #   }
-  # }
-  
-  
-  
+
   ## Object initialisation
   # gaussian model
   prop[1,] <- rdirichlet(1, par=rep(1,nbClass))
@@ -54,15 +43,13 @@ initializeModel <- function(continuousData, categoricalData, nbClass, ITERMAX) {
   # Multinomial
   alpha[,] <- rdirichlet(nbClass, par=rep(1,nbCatLevel))
   
-  # for(j in 1:nbCatLevel){
-  #   numberOfLevel <- length(unique(categoricalData[,j]))
-  #   for(h in 1:numberOfLevel){
-  #     alphaContainer[[j]][1,,h]<-rdirichlet(n = 1, par = rep(1, nbClass))
-  #   }
-  #
+  #loglik 
+  loglik <- array(NA, ITERMAX+1)
+  
   return(list(prop = prop,
               mu = mu,
               sigma = sigma,
-              alpha = alpha
+              alpha = alpha,
+              loglik = loglik
               ))
 }
