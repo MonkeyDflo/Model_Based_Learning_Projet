@@ -31,7 +31,6 @@ CalculateLoglik = function(xCate, xConti, KnbClasse, prop, mu, sigma, alpha, ITE
       # on multiplie itérativement par fk(x)
       # mu (ajouter une dim si on veut la stocker en fct du nombre d'itération)
       # sigma (pareil que mu)
-      print(paste('dmvnorm'))
       currX = xConti[i,]
       currMu = mu[ITER,k,]
       currSigma = sigma[ITER,k,,]
@@ -45,20 +44,4 @@ CalculateLoglik = function(xCate, xConti, KnbClasse, prop, mu, sigma, alpha, ITE
   }
   return(SommeSurIndividus)
 }
-
-
-
-# tests ####
-# split ... 
-source(file = "organize_dataset.R")
-source(file = "initialisation.R")
-res = splitDatasetIntoCatAndConti(iris)
-cat = res$categoricalMat
-resCate = binarizeCateMatrix(cat)
-# initialise 
-init = initializeModel(res$continuousMat, resCate, 3, 10)
-
-# test loglik
-loglik = CalculateLoglik(resCate, res$continuousMat, 3, init$prop, init$mu, init$sigma, init$alpha, ITER=1)
-print(loglik)
 
