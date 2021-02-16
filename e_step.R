@@ -1,50 +1,42 @@
 # calcul of probabilities
 
-# Conditionnal probability of continous data####
+# Conditionnal probability of  data####
 #' conditionalProbCont
-#' Takes continous observation, and return a conditional pobablilie based in the
+#' Takes continous observation and categorical data, return a conditional pobablilie based in the
 #' completed likehood esperance.
 #' @param continousData
 #' @param nbClass
 #' @param prop
 #' @param mu
 #' @param sigma
+#' @param IT iteration step
 #' @return tik matrix
-conditionalProbCont <- function(continousData, nbClass,prop, mu, sigma){
-  require(mclust)
-  n <- nrow(continousData)
-  
-  # Conditional probability tik that represente esperance Q
-  tik <- matrix(NA, n, nbClass)
-  
-  for(k in 1:nbClass)
-    tik[,k]<- prop[k]*dmvnorm(continousData, mean=mu[,k], sigma=sigma[k,,])
-  tik <- tik/rowSums(tik)
-  
-  return(tik)
-}
 
-# Conditionnal probability tik of categorical data####
-#' conditionalProbCat
-#' Takes categorical observations and return a conditional pobablilies based in the
-#' completed likehood esperance and multinomial distribution.
-#' @param categoricalData
-#' @param nbClass
-#' @param prop
-#' @param alpha
-#' @return tik matrix
-conditionalProbCat <- function(categoricalData, nbClass, prop, alpha){
-  
-  tik <- matrix(NA, nrow(categoricalData), 3)
-  for (k in 1:nbClass){
-    for(i in 1:nrow(categoricalData)){
-      tmp <- sapply(alpha[k,], FUN = '^', categoricalData[i,])
-      tik[i,k] <- prop[k]*prod(diag(tmp))
-    }
+conditionalProb <-
+  function(continousData,
+           categoricalData,
+           nbClass,
+           prop,
+           mu,
+           sigma,
+           alpha,
+           IT) {
+    if (nrow(continousData) == nrow(categoricalData)) {
+      n <- nrow(categoricalData)
+      tik <- matrix(NA, n, nbClass)
+      for (i in 1:n) {
+        for (k in 1:nbClass){
+          tik[i,k] <- prop[IT,k]*prod(alpha[k,]^categoricalData[i,])*dmvnorm(continousData[i,],
+                                                                             mean = mu[IT,k,],
+                                                                             sigma = sigma[IT,k,,])
+        }
+      }
+      tik <- tik/rowSums(tik)
+      return(tik)
+    }else{
+      stop('continous and categorical data has not the same length')
+    } 
   }
-  tik <- tik/rowSums(tik)
-  return(tik)
-}
 
 # Expectation step function 
 # ExpectationStep ####
@@ -58,19 +50,19 @@ conditionalProbCat <- function(categoricalData, nbClass, prop, alpha){
 #'  @param mu
 #'  @param sigma
 #'  @param alpha
+#'  @param IT iteration step
 #'  @return list of tik matrix of continuous and categorical observation
-ExpectationStep <-function(continousData, categoricalData, nbClass, prop, mu, sigma, alpha){
+ExpectationStep <-function(continousData, categoricalData, nbClass, prop, mu, sigma, alpha, IT){
   continousData <- continousData
   categoricalData <- categoricalData
   nbClass <- nbClass
   prop <- prop
   mu <- mu
   alpha <- alpha
+  IT <- IT
   
-  tikContinousData <- conditionalProbCont(continousData, nbClass, prop, mu, sigma)
-  tikCategoricalData <- conditionalProbCat(categoricalData, nbClass, prop, alpha)
+  tik <- conditionalProb(continousData, categoricalData, nbClass, prop, mu, sigma, alpha, IT)
   
-  return(list(tikContinousData = tikContinousData,
-              tikCategoricalData = tikCategoricalData))
+  return(tik)
 }
 
