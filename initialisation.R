@@ -37,7 +37,7 @@ initializeModel <- function(continuousData, categoricalData, nbClass, ITERMAX) {
   prop[1,] <- rdirichlet(1, par=rep(1,nbClass))
   mu[1,,] <- as.matrix(continuousData[sample(1:n,nbClass),])
   for (k in 1:nbClass){
-    sigma[k,1,,] <- cov(matrix(rnorm(p*p), ncol = p))
+    sigma[1,k,,] <- cov(matrix(rnorm(p*p), ncol = p))
   }
   
   # Multinomial
