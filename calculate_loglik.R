@@ -23,8 +23,8 @@ CalculateLoglik = function(xCate, xConti, KnbClasse, prop, mu, sigma, alpha, ITE
     for(k in 1:KnbClasse){
       
       ProduitSurCateg = 1
+      
       for(j in 1:length(alpha[1,])){
-        
         ProduitSurCateg = ProduitSurCateg * alpha[k,j]^xCate[i,j]
       }
       # => une fois qu'on a les produits sur les catégories 
@@ -35,10 +35,11 @@ CalculateLoglik = function(xCate, xConti, KnbClasse, prop, mu, sigma, alpha, ITE
       currX = xConti[i,]
       currMu = mu[ITER,k,]
       currSigma = sigma[ITER,k,,]
-      fkConti= dmvnorm(currX,currMu,currSigma) 
+      fkConti= dmvnorm(currX,mean = currMu,sigma = currSigma)
+      
       PrdCateConti = ProduitSurCateg * fkConti
       
-      SommeSurClasses = SommeSurClasses + prop[ITER,k] * PrdCateConti
+      SommeSurClasses = SommeSurClasses + (prop[ITER,k] * PrdCateConti)
     }
     SommeSurIndividus = SommeSurIndividus + log(SommeSurClasses)
   }
@@ -60,3 +61,4 @@ init = initializeModel(res$continuousMat, resCate, 3, 10)
 # test loglik
 loglik = CalculateLoglik(resCate, res$continuousMat, 3, init$prop, init$mu, init$sigma, init$alpha, ITER=1)
 print(loglik)
+

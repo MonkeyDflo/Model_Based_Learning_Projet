@@ -51,13 +51,8 @@ convertCateVectToBinMatrix <- function (cateVect) {
 #' for the column blue eye. See convertCateVectToBinMatrix to understand deeper. 
 #' @export 
 binarizeCateMatrix = function(cateMatrix) {
-  if( NCOL(cateMatrix) == 1) { 
-    return(convertCateVectToBinMatrix(cateMatrix))
-  }
-  else{
-    binCateMatrix = Reduce(cbind, apply(cateMatrix, 2, convertCateVectToBinMatrix))
-    return(binCateMatrix)
-  }
+  binCateMatrix = Reduce(cbind, lapply(cateMatrix, convertCateVectToBinMatrix))
+  return(binCateMatrix)
 }
 # function splitDatasetIntoCatAndConti ####
 #' function splitDatasetIntoCatAndConti
