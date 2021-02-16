@@ -34,9 +34,8 @@ MaximisationStep = function(tk, xBinCate, xConti, KnbClasse, prop, mu, sigma, al
   }
   #actualisation de sigma
   for(k in 1:KnbClasse){
-    # tik * (xi - muk)^t * (xi - muk)
-    sigma[ITER, k, , ] = (1 / nk) * lapply(1:n, 
-                                           function(i) tk[i,k] * (xConti[i,] - mu[ITER,k,]) %*% t(xConti[i,] - mu[ITER,k,]) )
+    sigma[ITER, k, , ] = Reduce('+', lapply(1:n, 
+                                            function(i) tk[i,k] * (xConti[i,] - mu[ITER,k,]) %*% t(xConti[i,] - mu[ITER,k,]) /nk) ) 
   }
   #actualisation de alpha
   # formule : alpha jhk = 1/nk * somme sur n des tik(xi) * x ijh
