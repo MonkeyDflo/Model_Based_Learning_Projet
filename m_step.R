@@ -24,32 +24,37 @@ MaximisationStep = function(tk, xBinCate, xConti, KnbClasse, prop, mu, sigma, al
     nk[k] = sum(tk[,k])
   }
   #actualisation de prop
-  # formule = pk() = nk/n 
+  # formule = pk() = nk/n
+  p <- array(NA, KnbClasse)
   for(k in 1:KnbClasse){
-    prop[ITER, k] = nk[k]/n
+    p[k]<- nk[k]/n
   }
   #actualisation de mus
+  m <- array(NA, dim = c(KnbClasse, ncol(xConti)))
   for(k in 1:KnbClasse){
-    mu[ITER,k] = (1 / nk) * sum( tk[,k] * xConti )
+    m[k,] = (1 / nk) * colSums( tk[,k] * xConti )
   }
   #actualisation de sigma
-  for(k in 1:KnbClasse){
-    sigma[ITER, k, , ] = Reduce('+', lapply(1:n, 
-                                            function(i) tk[i,k] * (xConti[i,] - mu[ITER,k,]) %*% t(xConti[i,] - mu[ITER,k,]) /nk) ) 
+  s <- array(NA, dim=c(KnbClasse, ncol(xConti), ncol(xConti)))
+  for (k in 1:KnbClasse) {
+    s[k,,] = Reduce(cbind, lapply(1:n,
+                               function(i)
+                                 tk[i, k] * (as.matrix(xConti[i, ]) - m[k, ]) %*% t(xConti[i, ] - m[k, ]) /nk))
   }
   #actualisation de alpha
   # formule : alpha jhk = 1/nk * somme sur n des tik(xi) * x ijh
+  a <- matrix(NA, KnbClasse, ncol(xCate))
   for(k in 1:KnbClasse){
     for(j in 1:ncol(xCate)){
       sumTkxi = sum( tk[,k] * xBinCate )
-      alpha[k,j] = ( 1 / nk[k] ) * sumTkxi
+      a[k,j] = ( 1 / nk[k] ) * sumTkxi
     }
   }
   
-  return(list(prop = prop, 
-              mu = mu, 
-              sigma = sigma, 
-              alpha = alpha))
+  return(list(prop = p, 
+              mu = m, 
+              sigma = s, 
+              alpha = a))
 }
 
 

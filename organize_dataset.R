@@ -10,7 +10,8 @@
 
 # packages ####
 library(bayess)
-library(mvtnorm)
+#library(mvtnorm)
+library(mclust)
 
 
 # function convertCateVectToBinMatrix ####

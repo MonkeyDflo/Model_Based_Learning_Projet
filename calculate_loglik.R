@@ -15,7 +15,7 @@
 #' @param alpha Probabilities for each categorical variables 
 #' @return log likelihood
 #' @export
-CalculateLoglik = function(xCate, xConti, KnbClasse, prop, mu, sigma, alpha, ITER){
+CalculateLoglik = function(xConti, xCate, KnbClasse, prop, mu, sigma, alpha, ITER){
   n = nrow(xCate)
   SommeSurIndividus = 0
   for(i in 1:n){
@@ -31,7 +31,7 @@ CalculateLoglik = function(xCate, xConti, KnbClasse, prop, mu, sigma, alpha, ITE
       # on multiplie itérativement par fk(x)
       # mu (ajouter une dim si on veut la stocker en fct du nombre d'itération)
       # sigma (pareil que mu)
-      print(paste('dmvnorm'))
+      #print(paste('dmvnorm'))
       currX = xConti[i,]
       currMu = mu[ITER,k,]
       currSigma = sigma[ITER,k,,]
@@ -46,19 +46,55 @@ CalculateLoglik = function(xCate, xConti, KnbClasse, prop, mu, sigma, alpha, ITE
   return(SommeSurIndividus)
 }
 
+# Loglik of  data####
+#' Loglik
+#' Takes continous observation and categorical data, return a conditional pobablilie based in the
+#' completed likehood esperance.
+#' @param continousData
+#' @param nbClass
+#' @param prop
+#' @param mu
+#' @param sigma
+#' @param ITER iteration step
+#' @return tik matrix
+loglikCalul <- function(continousData,
+                        categoricalData,
+                        nbClass,
+                        prop,
+                        mu,
+                        sigma,
+                        alpha,
+                        ITER){
+  # Test si n est correct
+  if(nrow(continousData)== nrow(categoricalData)){
+    n <- nrow(continousData)
+    tmp <- 0
+    for(i in 1:n){
+      for(k in 1:nbClass){
+        tmp <- log(prop[ITER,k]*prod(alpha[k,]^categoricalData[i,]))
+        +log(prop[ITER,k]*dmvnorm(continousData[i,],
+                                  mean=mu[ITER,k,],
+                                  sigma=sigma[ITER,k,,]))
+      }
+    }
+    return(tmp)
+  }else{
+    stop('continous and categorical data has not the same length')
+  }
+}
 
 
 # tests ####
 # split ... 
-source(file = "organize_dataset.R")
-source(file = "initialisation.R")
-res = splitDatasetIntoCatAndConti(iris)
-cat = res$categoricalMat
-resCate = binarizeCateMatrix(cat)
-# initialise 
-init = initializeModel(res$continuousMat, resCate, 3, 10)
-
-# test loglik
-loglik = CalculateLoglik(resCate, res$continuousMat, 3, init$prop, init$mu, init$sigma, init$alpha, ITER=1)
-print(loglik)
+# source(file = "organize_dataset.R")
+# source(file = "initialisation.R")
+# res = splitDatasetIntoCatAndConti(iris)
+# cat = res$categoricalMat
+# resCate = binarizeCateMatrix(cat)
+# # initialise 
+# init = initializeModel(res$continuousMat, resCate, 3, 10)
+# 
+# # test loglik
+# loglik = CalculateLoglik(resCate, res$continuousMat, 3, init$prop, init$mu, init$sigma, init$alpha, ITER=1)
+# print(loglik)
 

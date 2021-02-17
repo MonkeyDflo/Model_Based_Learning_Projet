@@ -9,7 +9,7 @@
 #' @param prop
 #' @param mu
 #' @param sigma
-#' @param IT iteration step
+#' @param ITER iteration step
 #' @return tik matrix
 
 conditionalProb <-
@@ -20,15 +20,15 @@ conditionalProb <-
            mu,
            sigma,
            alpha,
-           IT) {
+           ITER) {
     if (nrow(continousData) == nrow(categoricalData)) {
       n <- nrow(categoricalData)
       tik <- matrix(NA, n, nbClass)
       for (i in 1:n) {
         for (k in 1:nbClass){
-          tik[i,k] <- prop[IT,k]*prod(alpha[k,]^categoricalData[i,])*dmvnorm(continousData[i,],
-                                                                             mean = mu[IT,k,],
-                                                                             sigma = sigma[IT,k,,])
+          tik[i,k] <- prop[ITER,k]*prod(alpha[k,]^categoricalData[i,])*dmvnorm(continousData[i,],
+                                                                             mean = mu[ITER,k,],
+                                                                             sigma = sigma[ITER,k,,])
         }
       }
       tik <- tik/rowSums(tik)
@@ -50,18 +50,18 @@ conditionalProb <-
 #'  @param mu
 #'  @param sigma
 #'  @param alpha
-#'  @param IT iteration step
+#'  @param ITER iteration step
 #'  @return list of tik matrix of continuous and categorical observation
-ExpectationStep <-function(continousData, categoricalData, nbClass, prop, mu, sigma, alpha, IT){
+ExpectationStep <-function(continousData, categoricalData, nbClass, prop, mu, sigma, alpha, ITER){
   continousData <- continousData
   categoricalData <- categoricalData
   nbClass <- nbClass
   prop <- prop
   mu <- mu
   alpha <- alpha
-  IT <- IT
+  ITER <- ITER
   
-  tik <- conditionalProb(continousData, categoricalData, nbClass, prop, mu, sigma, alpha, IT)
+  tik <- conditionalProb(continousData, categoricalData, nbClass, prop, mu, sigma, alpha, ITER)
   
   return(tik)
 }
