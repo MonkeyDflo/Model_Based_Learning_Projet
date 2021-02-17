@@ -11,7 +11,6 @@
 #' @param sigma
 #' @param ITER iteration step
 #' @return tik matrix
-
 conditionalProb <-
   function(continousData,
            categoricalData,
@@ -37,6 +36,22 @@ conditionalProb <-
       stop('continous and categorical data has not the same length')
     } 
   }
+
+
+conditionalProb2 <- function(continousData,
+                             categoricalData,
+                             nbClass,
+                             prop,
+                             mu,
+                             sigma,
+                             alpha,
+                             ){
+  tik <- sapply(1:nbClass,
+              function(c) prod(alpha[c,]^categoricalData)
+              *dmvnorm(continousData, mean=mu, sigma=sigma))
+  tik <- t(prop*t(tik))/rowSums(t(prop*t(tik)))
+  return(tik)
+}
 
 # Expectation step function 
 # ExpectationStep ####

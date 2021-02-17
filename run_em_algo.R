@@ -75,23 +75,39 @@ runEMAlgoritm <- function(data, nbClass, ITERMAX, mode = "random"){
     
     # Perform Maximization step
     # estimation of paramater prop, mu, sigma and alpha
-    mStepRes <- MaximisationStep(tik, 
-                     categoricalData, 
-                     continousData, 
-                     nbClass,
-                     prop, 
-                     mu, 
-                     sigma, 
-                     alpha, 
-                     ITER)
-    prop[ITER+1,] <- mStepRes$prop
-    mu[ITER+1,,] <- mStepRes$mu
-    sigma[ITER+1,,,] <- mStepRes$sigma
-    alpha <- mStepRes$alpha
-    # prop = mStepRes$prop 
-    # mu = mStepRes$mu 
-    # sigma = mStepRes$sigma 
-    # alpha = mStepRes$alpha
+    # mStepRes <- MaximisationStep(tik, 
+    #                  categoricalData, 
+    #                  continousData, 
+    #                  nbClass,
+    #                  prop, 
+    #                  mu, 
+    #                  sigma, 
+    #                  alpha, 
+    #                  ITER)
+    # prop[ITER+1,] <- mStepRes$prop
+    # mu[ITER+1,,] <- mStepRes$mu
+    # sigma[ITER+1,,,] <- mStepRes$sigma
+    # alpha <- mStepRes$alpha
+    
+    nk <- round(colSums(tik))
+    
+    prop[ITER+1,] <- nk/sum(nk)
+    mu[ITER + 1, , ] <-
+      t(sapply(1:nbClass, function(c)
+        (1 / nk[c]) * colSums(tik[, c] * continousData)))
+    
+    for(i in 1:ncol(continousData))
+      for (j in 1:ncol(continousData))
+        for (k in 1:nbClass)
+          sigma[ITER + 1, k, i, j] <-
+      1 / nk[k] * sum(tik[, k] * (continousData[, i] - mu[ITER + 1, k, i]) * tik[, k] *
+                        (continousData[, j] - mu[ITER + 1, k, j]))
+    
+    for(k in 1:nbClass)
+      for (j in 1:ncol(categoricalData))
+        alpha[k, j] <- (1 / nk[k]) * sum(tik[, k] * categoricalData)
+     
+
     
     # Calcul of loglik of the next interation
     loglik[ITER+1] <- loglikCalul(continousData, 
@@ -127,7 +143,9 @@ runEMAlgoritm <- function(data, nbClass, ITERMAX, mode = "random"){
 }
 
 
-# Test
-obj <- runEMAlgoritm(data,3,15)
-plot(obj$loglik,type='l',main=paste('max loglik :',max(obj$loglik)),cex.main=0.8)
-obj$loglik
+### Test
+data <-iris
+res <- runEMAlgoritm(data,3,15)
+res(res$loglik,type='l',main=paste('max loglik :',max(res$loglik)),cex.main=0.8)
+res$loglik
+res$class
