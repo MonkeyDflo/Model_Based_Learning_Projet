@@ -146,6 +146,6 @@ runEMAlgoritm <- function(data, nbClass, ITERMAX, mode = "random"){
 ### Test
 data <-iris
 res <- runEMAlgoritm(data,3,15)
-res(res$loglik,type='l',main=paste('max loglik :',max(res$loglik)),cex.main=0.8)
-res$loglik
-res$class
+plot(res$loglik,type='l',main=paste('max loglik :',max(res$loglik)),cex.main=0.8)
+plot(data,col=res$class)
+

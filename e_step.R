@@ -44,8 +44,9 @@ conditionalProb2 <- function(continousData,
                              prop,
                              mu,
                              sigma,
-                             alpha,
-                             ){
+                             alpha
+                             )
+{
   tik <- sapply(1:nbClass,
               function(c) prod(alpha[c,]^categoricalData)
               *dmvnorm(continousData, mean=mu, sigma=sigma))
