@@ -45,14 +45,7 @@ runEMAlgoritm <- function(data, nbClass, ITERMAX, mode = "random"){
   # Beggin of loops
   ITER <- 1
   LIMITE <- 1
-  # loglik[1] <- CalculateLoglik(continousData, 
-  #                              categoricalData, 
-  #                              nbClass,
-  #                              prop,
-  #                              mu,
-  #                              sigma,
-  #                              alpha,
-  #                              1)
+
   loglik[1] <- loglikCalul(continousData,
                                categoricalData,
                                nbClass,
@@ -62,16 +55,29 @@ runEMAlgoritm <- function(data, nbClass, ITERMAX, mode = "random"){
                                alpha,
                                1)
   
+  
+  
   while(ITER <= ITERMAX){
     # Perform Expectaion step
-    tik <- ExpectationStep(continousData, 
-                           categoricalData, 
-                           nbClass, 
-                           prop, 
+    # tik <- ExpectationStep(continousData, 
+    #                        categoricalData, 
+    #                        nbClass, 
+    #                        prop, 
+    #                        mu,
+    #                        sigma,
+    #                        alpha,
+    #                        ITER)
+    
+    tik <- conditionalProb(continousData,
+                           categoricalData,
+                           nbClass,
+                           prop,
                            mu,
                            sigma,
                            alpha,
                            ITER)
+    
+    
     
     # Perform Maximization step
     # estimation of paramater prop, mu, sigma and alpha
@@ -145,7 +151,9 @@ runEMAlgoritm <- function(data, nbClass, ITERMAX, mode = "random"){
 
 ### Test
 data <-iris
-res <- runEMAlgoritm(data,3,15)
+#data <- diabetes
+
+res <- runEMAlgoritm(data,3,150)
 plot(res$loglik,type='l',main=paste('max loglik :',max(res$loglik)),cex.main=0.8)
 plot(data,col=res$class)
-
+table(data[,5],res$class)

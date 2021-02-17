@@ -84,6 +84,24 @@ loglikCalul <- function(continousData,
 }
 
 
+calcLoglik <- function(continousData,
+                         categoricalData,
+                         nbClass,
+                         prop,
+                         mu,
+                         sigma,
+                         alpha){
+  loglik <- 0
+  for(k in 1:nbClass)
+    loglik1 <- loglik + sum(log(prop[k,]*(alpa[c,]^continousData)))
+    loglik <- loglik1 + sum(log(prop[k,])+log(apply(data[, 1:4], 1, function(xi)
+    dmvnorm(xi,
+            mean = mu, 
+            sigma = sigma )
+    )))
+  return(loglik)
+}
+
 # tests ####
 # split ... 
 # source(file = "organize_dataset.R")
