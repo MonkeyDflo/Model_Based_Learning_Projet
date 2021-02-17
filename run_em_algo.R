@@ -62,7 +62,7 @@ runEMAlgoritm <- function(data, nbClass, ITERMAX, mode = "random"){
                                alpha,
                                1)
   
-  while(ITER < ITERMAX){
+  while(ITER <= ITERMAX){
     # Perform Expectaion step
     tik <- ExpectationStep(continousData, 
                            categoricalData, 
@@ -88,6 +88,10 @@ runEMAlgoritm <- function(data, nbClass, ITERMAX, mode = "random"){
     mu[ITER+1,,] <- mStepRes$mu
     sigma[ITER+1,,,] <- mStepRes$sigma
     alpha <- mStepRes$alpha
+    # prop = mStepRes$prop 
+    # mu = mStepRes$mu 
+    # sigma = mStepRes$sigma 
+    # alpha = mStepRes$alpha
     
     # Calcul of loglik of the next interation
     loglik[ITER+1] <- loglikCalul(continousData, 
@@ -97,20 +101,20 @@ runEMAlgoritm <- function(data, nbClass, ITERMAX, mode = "random"){
                                       mu,
                                       sigma,
                                       alpha,
-                                      ITER)
+                                      ITER+1)
     
     
     ITER <- ITER +1
     LIMITE <- loglik[ITER+1]-loglik[ITER]
-    if(LIMITE <=1e-6){
-      return(
-        # TODO: best way to raise warning
-        c(
-          print(paste("WARNING: we stoped the algorithm because limit is under or equal to: )", 1e-6))
-        ),
-        list())
-      break
-    }
+    # if(LIMITE <=1e-6){
+    #   return(
+    #     # TODO: best way to raise warning
+    #     c(
+    #       print(paste("WARNING: we stoped the algorithm because limit is under or equal to: )", 1e-6))
+    #     ),
+    #     list())
+    #   break
+    # }
   }
   z=max.col(tik)
   
@@ -118,9 +122,12 @@ runEMAlgoritm <- function(data, nbClass, ITERMAX, mode = "random"){
               mu = mu,
               sigma= sigma,
               alpha = alpha,
+              loglik = loglik,
               class = z))
 }
 
 
 # Test
-runEMAlgoritm(data,3,10)
+obj <- runEMAlgoritm(data,3,15)
+plot(obj$loglik,type='l',main=paste('max loglik :',max(obj$loglik)),cex.main=0.8)
+obj$loglik

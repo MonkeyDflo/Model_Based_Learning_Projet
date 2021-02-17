@@ -37,25 +37,24 @@ MaximisationStep = function(tk, xBinCate, xConti, KnbClasse, prop, mu, sigma, al
   #actualisation de sigma
   s <- array(NA, dim=c(KnbClasse, ncol(xConti), ncol(xConti)))
   for (k in 1:KnbClasse) {
-    s[k,,] = Reduce(cbind, lapply(1:n,
-                               function(i)
-                                 tk[i, k] * (as.matrix(xConti[i, ]) - m[k, ]) %*% t(xConti[i, ] - m[k, ]) /nk))
-  }
+    sig <- colSums(sqrt(tk[,k])*(xConti-m[k,]))%*%t(colSums(sqrt(tk[,k])*(xConti-m[k,])))/nk
+    sig <- (sig+t(sig))/2
+    s[k,,] = sig 
+      }
   #actualisation de alpha
   # formule : alpha jhk = 1/nk * somme sur n des tik(xi) * x ijh
-  a <- matrix(NA, KnbClasse, ncol(xCate))
+  a <- matrix(NA, KnbClasse, ncol(xBinCate))
   for(k in 1:KnbClasse){
-    for(j in 1:ncol(xCate)){
+    for(j in 1:ncol(xBinCate)){
       sumTkxi = sum( tk[,k] * xBinCate )
       a[k,j] = ( 1 / nk[k] ) * sumTkxi
     }
   }
-  
-  return(list(prop = p, 
-              mu = m, 
-              sigma = s, 
+
+  return(list(prop = p,
+              mu = m,
+              sigma = s,
               alpha = a))
 }
-
 
 
