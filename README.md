@@ -2,6 +2,9 @@
 Project for Model Based Learning course.  
 Credit goes to Gabin Marc Telly and Florent Jakubowski.
 
+To see final working project please go to Marc's Repo : https://github.com/MARCTELLY/mixDatClust
+
+
 # Packages used
 devtools - An essential suite of tools for turning your code into an R package.  
 testthat - testthat provides an easy way to write unit tests for your code projects.  
